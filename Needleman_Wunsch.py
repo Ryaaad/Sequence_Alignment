@@ -60,21 +60,56 @@ MatrixBLOSUM62 = {
 }
 Indel=-2
 
-# def Fill(seq1,Matrix,seq2,i,j):
-#  M=''
-#  if seq1==seq2:
-#   pass
-#  else :
-#   pass
-#  return M
+def GenerateChemin(Matrix):
+ path=[]
+ m=len(Matrix)
+ n=len(Matrix[0]) 
+ path.append({'i':n-1,'j':m-1,'value':Matrix[m-1][n-1]})
+ i=n-1
+ j=m-1
+ while i>1 and j>1 :
+    #  print(f"i: {i},j:{j} , j : {Matrix[0][j]} , i:{Matrix[i][0]} ")
+     if(Matrix[j][0]==Matrix[0][i]):
+      path.append({'i':i-1,'j':j-1,'value':Matrix[j-1][i-1]})
+      j=j-1
+      i=i-1
+     else : 
+      Max=max(Matrix[j-1][i],Matrix[j-1][i-1],Matrix[j][i-1])
+      if(Matrix[j-1][i] == Max):
+       path.append({'i':i,'j':j-1,'value':Matrix[j-1][i]})
+       j=j-1
+      elif(Matrix[j][i-1] == Max) :
+        path.append({'i':i-1,'j':j,'value':Matrix[j][i-1]})
+        i=i-1
+      elif(Matrix[j-1][i-1] == Max) :   
+        path.append({'i':i-1,'j':j-1,'value':Matrix[j-1][i-1]})
+        j=j-1
+        i=i-1
+ path.append({'i':1,'j':1,'value':Matrix[1][1]})
+ print(path)
+ return path
 
-# def GenerateChemin():
-#  pass 
+
+def Affichage(Matrix):
+ for i in range(len(Matrix)):
+  print("\n")
+  for j in range(len(Matrix[0])):
+    print(f" {Matrix[i][j]} \t " , end='')
+ print("\n")   
+
+
+def FillMatrix(Matrix):
+ for i in range(2,len(Matrix)):
+  for j in range(2,len(Matrix[0])):
+     Matrix[i][j]=max(Matrix[i-1][j-1]+MatrixBLOSUM62[Matrix[i][0]][Matrix[0][j]],Matrix[i][j-1]+Indel,Matrix[i-1][j]+Indel)
+ return Matrix
 
 def initiatMatrix(seq1,seq2):
- if len(seq1)<=len(seq2):
-  Matrix=[[0]*(len(seq2)+1) for _ in range(len(seq1) + 3)]
+  Matrix=[[0]*(len(seq1)+2) for _ in range(len(seq2) + 2)]
   Matrix[0][0]='/'
+  Matrix[0][1]='i'
+  Matrix[1][0]='j'
+  Matrix[1][1]=0
   j=2
   for i in seq1:
     Matrix[0][j]=i
@@ -83,19 +118,15 @@ def initiatMatrix(seq1,seq2):
   for i in seq2:
     Matrix[j][0]=i
     j=j+1  
-  Matrix[0][1]='i'
-  Matrix[1][0]='j'
-  Matrix[1][1]=0
+
   for i in range(2,len(Matrix[0])):
    Matrix[1][i]=Matrix[1][i-1] + Indel 
-   for i in range(2,len(Matrix)):
-    Matrix[i][1]=Matrix[1][i-1] + Indel 
+  for j in range(2,len(Matrix)):
+    Matrix[j][1]=Matrix[j-1][1] + Indel 
+  return Matrix
 
- for i in range(2,len(Matrix)):
-  for j in range(2,len(Matrix[0])):
-     Matrix[i][j]=max(Matrix[i-1][j-1]+MatrixBLOSUM62[Matrix[i][0]][Matrix[0][j]],Matrix[i][j-1]+Indel,Matrix[i-1][j]+Indel)
 
- for i in Matrix:
-  print(i)
-
-initiatMatrix("GATCT","AGCGTC")
+Matrix=initiatMatrix("GAT","AGCT")
+Matrix=FillMatrix(Matrix)
+Affichage(Matrix)
+path=GenerateChemin(Matrix)
