@@ -60,6 +60,29 @@ MatrixBLOSUM62 = {
 }
 Indel=-2
 
+def NewAligments(seq1,seq2,path):
+  Newseq1=''
+  Newseq2=''
+  indexSeq1=0
+  indexSeq2=0
+  pIndex=len(path)-1
+  while pIndex > 0:
+#    i+1 , j+1 , j+1,i+1
+   if(path[pIndex]["i"] < path[pIndex-1]["i"] and path[pIndex]["j"] < path[pIndex-1]["j"] ):
+     Newseq1+=seq1[indexSeq1]
+     Newseq2+=seq2[indexSeq2]
+     indexSeq1+=1
+     indexSeq2+=1
+   elif(path[pIndex]["i"] < path[pIndex-1]["i"]):
+      Newseq1+=seq1[indexSeq1]
+      Newseq2+='-'
+      indexSeq1+=1
+   elif(path[pIndex]["j"] < path[pIndex-1]["j"]):
+      Newseq2+=seq2[indexSeq2]
+      Newseq1+='-'
+      indexSeq2+=1  
+   pIndex-=1
+  return Newseq1,Newseq2
 def GenerateChemin(Matrix):
  path=[]
  m=len(Matrix)
@@ -85,7 +108,8 @@ def GenerateChemin(Matrix):
         path.append({'i':i-1,'j':j-1,'value':Matrix[j-1][i-1]})
         j=j-1
         i=i-1
- path.append({'i':1,'j':1,'value':Matrix[1][1]})
+ if(path[len(path)-1]!={'i': 1, 'j': 1, 'value': 0})   :    
+  path.append({'i':1,'j':1,'value':Matrix[1][1]})
  print(path)
  return path
 
@@ -125,8 +149,12 @@ def initiatMatrix(seq1,seq2):
     Matrix[j][1]=Matrix[j-1][1] + Indel 
   return Matrix
 
-
-Matrix=initiatMatrix("GAT","AGCT")
+seq1="TAGATV" ; seq2="ATGCT"
+Matrix=initiatMatrix(seq1,seq2)
 Matrix=FillMatrix(Matrix)
 Affichage(Matrix)
 path=GenerateChemin(Matrix)
+seq1,seq2=NewAligments(seq1,seq2,path)
+print(seq1)
+print(seq2)
+
