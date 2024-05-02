@@ -1,3 +1,4 @@
+import copy
 MatrixBLOSUM62 = {
     "A": {
         "A": 4, "R": -1, "N": -2, "D": -2, "C": 0, "Q": -1, "E": -1, "G": 0, "H": -2, "I": -1, "L": -1, "K": -1, "M": -1, "F": -2, "P": -1, "S": 1, "T": 0, "W": -3, "Y": -2, "V": 0
@@ -83,35 +84,79 @@ def NewAligments(seq1,seq2,path):
       indexSeq2+=1  
    pIndex-=1
   return Newseq1,Newseq2
-def GenerateChemin(Matrix):
+def Path_Exist(i,j,filepath,move):
+  if(not filepath):
+    return False
+  for Crossed in filepath: 
+    if(Crossed['indexs']["i"]==i and Crossed['indexs']["j"]==j and Crossed["move"]==move ):
+      return True
+  return False    
+
+def OptimalPath(paths):
+  if(len(paths)==1):
+    return paths[0]
+  else: 
+    scores=[]
+    for path in paths:
+     sum=0
+     for move in path:
+       sum+=move['value']
+     scores.append(sum)  
+     max_score= max(scores) 
+     max_index = scores.index(max_score)
+    return paths[max_index]
+def GeneratePaths(Matrix):
  path=[]
+ paths=[]
+ filepath=[]
  m=len(Matrix)
  n=len(Matrix[0]) 
  path.append({'i':n-1,'j':m-1,'value':Matrix[m-1][n-1]})
  i=n-1
  j=m-1
+ path,filepath=GenerateChemin(Matrix,path,filepath,i,j)
+ paths.append(path)
+ fileIndex=0
+ while(fileIndex < len(filepath) ):
+   i=filepath[fileIndex]['indexs']['i']
+   j=filepath[fileIndex]['indexs']['j']
+   path,filepath=GenerateChemin(Matrix,path=filepath[fileIndex]['path'],filepath=filepath,i=i,j=j)
+   paths.append(path)
+   fileIndex+=1
+
+#  print(filepath)
+ return paths
+
+
+def GenerateChemin(Matrix,path,filepath,i,j):
+
  while i>1 and j>1 :
-    #  print(f"i: {i},j:{j} , j : {Matrix[0][j]} , i:{Matrix[i][0]} ")
-     if(Matrix[j][0]==Matrix[0][i]):
+    if(Matrix[j][0]==Matrix[0][i]):
       path.append({'i':i-1,'j':j-1,'value':Matrix[j-1][i-1]})
       j=j-1
       i=i-1
-     else : 
+    else : 
       Max=max(Matrix[j-1][i],Matrix[j-1][i-1],Matrix[j][i-1])
-      if(Matrix[j-1][i] == Max):
+      if(Matrix[j-1][i] == Max and not Path_Exist(i,j,filepath,"UP") ):
+       if(Matrix[j][i-1] == Max or Matrix[j-1][i-1] == Max):  # en cas il ya un ou plusieur autre chemin ( le cas ou les 3 ont la meme valeur )
+         filepath.append({'path':copy.deepcopy(path),'move':"UP",'indexs':{'i':i,'j':j}})
+
        path.append({'i':i,'j':j-1,'value':Matrix[j-1][i]})
        j=j-1
-      elif(Matrix[j][i-1] == Max) :
+
+      elif(Matrix[j][i-1] == Max and not Path_Exist(i,j,filepath,"RIGHT")) :
+        if(Matrix[j-1][i-1] == Max): # en cas il ya un ou plusieur autre chemin ( le cas ou les 3 ont la meme valeur )
+         filepath.append({'path':copy.deepcopy(path),'move':"RIGHT",'indexs':{'i':i,'j':j}})
         path.append({'i':i-1,'j':j,'value':Matrix[j][i-1]})
         i=i-1
+     
       elif(Matrix[j-1][i-1] == Max) :   
         path.append({'i':i-1,'j':j-1,'value':Matrix[j-1][i-1]})
         j=j-1
         i=i-1
  if(path[len(path)-1]!={'i': 1, 'j': 1, 'value': 0})   :    
   path.append({'i':1,'j':1,'value':Matrix[1][1]})
- print(path)
- return path
+ return path,filepath
 
 
 def Affichage(Matrix):
@@ -149,12 +194,18 @@ def initiatMatrix(seq1,seq2):
     Matrix[j][1]=Matrix[j-1][1] + Indel 
   return Matrix
 
-seq1="TAGATV" ; seq2="ATGCT"
+seq1="ACGT" ; seq2="ACGTA"
 Matrix=initiatMatrix(seq1,seq2)
 Matrix=FillMatrix(Matrix)
+# Matrix[6][4]=24
+# Matrix[5][4]=24
 Affichage(Matrix)
-path=GenerateChemin(Matrix)
-seq1,seq2=NewAligments(seq1,seq2,path)
+paths=GeneratePaths(Matrix)
+for path in paths:
+ print(f"paths : {path} ")
+Bestpath=OptimalPath(paths) 
+print(f"Bestpath : {Bestpath}")
+seq1,seq2=NewAligments(seq1,seq2,Bestpath)
 print(seq1)
 print(seq2)
 
