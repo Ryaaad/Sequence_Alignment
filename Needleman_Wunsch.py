@@ -194,11 +194,9 @@ def initiatMatrix(seq1,seq2):
     Matrix[j][1]=Matrix[j-1][1] + Indel 
   return Matrix
 
-seq1="ACGT" ; seq2="ACGTA"
+seq1="ACGTTT" ; seq2="AACGTA"
 Matrix=initiatMatrix(seq1,seq2)
 Matrix=FillMatrix(Matrix)
-# Matrix[6][4]=24
-# Matrix[5][4]=24
 Affichage(Matrix)
 paths=GeneratePaths(Matrix)
 for path in paths:
@@ -206,6 +204,7 @@ for path in paths:
 Bestpath=OptimalPath(paths) 
 print(f"Bestpath : {Bestpath}")
 seq1,seq2=NewAligments(seq1,seq2,Bestpath)
+score=Matrix[len(Matrix)-1][len(Matrix[0])-1]
+print(f" Best score : {score} ")
 print(seq1)
 print(seq2)
-
