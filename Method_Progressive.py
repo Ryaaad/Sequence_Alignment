@@ -95,7 +95,16 @@ def CreatNewSeqs(P,Matrix):
   Index-=1
  return NewSeq1 , NewSeq2
 
-
+def CreatProfil(Seq1,Seq2):
+  profil={}
+  i=0
+  while i<len(Seq1):
+    if Seq1[i]==Seq2[i]:
+      profil[i]=Seq1[i]
+    else :
+      profil[i]={1:Seq1[i],2:Seq2[i]}
+    i+=1
+  return profil  
 Min_Score , Seq1 , Seq2 =combination(["TAT","GAOTO","TAITI","AA"])
 print(Min_Score , Seq1 , Seq2)
 Matrix=Levenshtein(Seq1,Seq2)
@@ -104,3 +113,6 @@ P=Path(Matrix)
 print(P)
 SEQ,SEQ2=CreatNewSeqs(P,Matrix)
 print(f"{SEQ} \n{SEQ2}")
+
+Profil=CreatProfil(SEQ,SEQ2)
+print(Profil)
