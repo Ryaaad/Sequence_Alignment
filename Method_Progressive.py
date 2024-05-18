@@ -21,13 +21,20 @@ def Levenshtein(seq1,seq2):
           cout=1
         Matrix[i][j]=min(Matrix[i-1][j-1]+cout,Matrix[i][j-1]+1,Matrix[i-1][j]+1)
     return Matrix
-def ShowMatrix(Matrix):
+def Show_LevMatrix(Matrix):
    for i in range(len(Matrix)): 
      for j in range(len(Matrix[0])) :
       print(f" {Matrix[i][j]} \t " , end='')
      print('\n')
-     
-def combination(Seqs):
+
+def Generate_Combinations(Seqs):
+  index_pairs=[]
+  for i in range(len(Seqs)):
+    for j in range(i+1,len(Seqs)):
+      index_pairs.append({"i":i,"j":j})
+  return index_pairs  
+
+def Best_Score(Seqs):
   Matrix=Levenshtein(Seqs[0],Seqs[1])
   Min_Score=Matrix[len(Matrix)-1][len(Matrix[0])-1]
   IndexI=0
@@ -65,7 +72,7 @@ def Path(Matrix):
    P.append({'i':1,'j':1,'value':0})      
   return P
   
-def CreatNewSeqs(P,Matrix):
+def NewSeqs(P,Matrix):
  Index=len(P)-1
  NewSeq1=''
  IndexSeq1=2
@@ -95,7 +102,7 @@ def CreatNewSeqs(P,Matrix):
   Index-=1
  return NewSeq1 , NewSeq2
 
-def CreatProfil(Seq1,Seq2):
+def Creat_Profil(Seq1,Seq2):
   profil={}
   i=0
   while i<len(Seq1):
@@ -105,14 +112,18 @@ def CreatProfil(Seq1,Seq2):
       profil[i]={1:Seq1[i],2:Seq2[i]}
     i+=1
   return profil  
-Min_Score , Seq1 , Seq2 =combination(["TAT","GAOTO","TAITI","AA"])
+
+Seqs=["TAT","GAOTO","TAITI","AA"]
+index_pairs=Generate_Combinations(Seqs)
+print(index_pairs)
+Min_Score , Seq1 , Seq2 =Best_Score(Seqs)
 print(Min_Score , Seq1 , Seq2)
 Matrix=Levenshtein(Seq1,Seq2)
-ShowMatrix(Matrix)
+Show_LevMatrix(Matrix)
 P=Path(Matrix)
 print(P)
-SEQ,SEQ2=CreatNewSeqs(P,Matrix)
+SEQ,SEQ2=NewSeqs(P,Matrix)
 print(f"{SEQ} \n{SEQ2}")
 
-Profil=CreatProfil(SEQ,SEQ2)
+Profil=Creat_Profil(SEQ,SEQ2)
 print(Profil)
