@@ -1,3 +1,17 @@
+def Char_Equal(S1,S2):
+  if(isinstance(S1, list) and not isinstance(S2, list) ):
+    for i in S1:
+      if S2==i:
+        return True
+    return False  
+  
+  if(isinstance(S2, list) and not isinstance(S1, list) ):
+    for i in S2:
+      if S1==i:
+        return True
+    return False  
+  return S1==S2
+
 def Levenshtein(seq1,seq2):
     Matrix=[[0]*(len(seq2)+2) for _ in range(len(seq1) + 2)]
     Matrix[0][0]='*'
@@ -15,7 +29,7 @@ def Levenshtein(seq1,seq2):
     for i in range(2,len(Matrix)):
       for j in range(2,len(Matrix[0])):
         cout=0
-        if(Matrix[i][0]==Matrix[0][j]): 
+        if(Char_Equal(Matrix[i][0],Matrix[0][j]) ): 
            cout=0
         else : 
           cout=1
@@ -72,58 +86,61 @@ def Path(Matrix):
    P.append({'i':1,'j':1,'value':0})      
   return P
   
-def NewSeqs(P,Matrix):
- Index=len(P)-1
- NewSeq1=''
+def NewSeqs(Path,Matrix):
+ Index=len(Path)-1
+ NewSeq1=[]
  IndexSeq1=2
- NewSeq2=''
+ NewSeq2=[]
  IndexSeq2=2
  while Index>0 :
-  print(f"Index ! {Index}",end='')
-  if(P[Index]['j'] < P[Index-1]['j'] and P[Index]['i'] < P[Index-1]['i']  ) :
-    print(f"\t  IndexSeq1 : {IndexSeq1} \t IndexSeq2 : {IndexSeq2} ")
-    NewSeq1+=Matrix[0][IndexSeq1]
-    NewSeq2+=Matrix[IndexSeq2][0]
+  if(Path[Index]['j'] < Path[Index-1]['j'] and Path[Index]['i'] < Path[Index-1]['i']  ) :
+    NewSeq1.append(Matrix[0][IndexSeq1])
+    NewSeq2.append(Matrix[IndexSeq2][0])
     IndexSeq1+=1
     IndexSeq2+=1
   else : 
-    if P[Index]['j'] < P[Index-1]['j'] :
-      NewSeq1+=Matrix[0][IndexSeq1]
+    if Path[Index]['j'] < Path[Index-1]['j'] :
+      NewSeq1.append(Matrix[0][IndexSeq1])
       NewSeq2+='_'
       IndexSeq1+=1
-      print(f"\t IndexSeq1 : {IndexSeq2} ")
 
     else :
-      NewSeq2+=Matrix[IndexSeq2][0]
+      NewSeq2.append(Matrix[IndexSeq2][0])
       NewSeq1+='_'
       IndexSeq2+=1
-      print(f"\t IndexSeq2 : {IndexSeq2} ")
 
   Index-=1
  return NewSeq1 , NewSeq2
 
 def Creat_Profil(Seq1,Seq2):
-  profil={}
+  profil=[[] for _ in range(len(Seq1))] 
   i=0
   while i<len(Seq1):
     if Seq1[i]==Seq2[i]:
       profil[i]=Seq1[i]
     else :
-      profil[i]={1:Seq1[i],2:Seq2[i]}
+      profil[i].append(Seq1[i])
+      profil[i].append(Seq2[i])
     i+=1
   return profil  
 
-Seqs=["TAT","GAOTO","TAITI","AA"]
-index_pairs=Generate_Combinations(Seqs)
-print(index_pairs)
-Min_Score , Seq1 , Seq2 =Best_Score(Seqs)
-print(Min_Score , Seq1 , Seq2)
-Matrix=Levenshtein(Seq1,Seq2)
-Show_LevMatrix(Matrix)
-P=Path(Matrix)
-print(P)
-SEQ,SEQ2=NewSeqs(P,Matrix)
-print(f"{SEQ} \n{SEQ2}")
+def Main(Seqs):
+  while(len(Seqs)>1):
+   Min_Score , Seq1 , Seq2 =Best_Score(Seqs)  
+   Matrix=Levenshtein(Seq1,Seq2)
+   Show_LevMatrix(Matrix)
+   P=Path(Matrix)
+   SEQ,SEQ2=NewSeqs(P,Matrix)
+   print(SEQ,SEQ2)
+   Profil=Creat_Profil(SEQ,SEQ2)
+   Seqs.remove(Seq1)
+   Seqs.remove(Seq2)
+   Seqs.append(Profil)
+   print(Profil)
+   print(Seqs)
+  print(f"Fin : {Profil}")
 
-Profil=Creat_Profil(SEQ,SEQ2)
-print(Profil)
+
+Seqs=["TAT","GAITO","TAITI","AA"]
+index_pairs=Generate_Combinations(Seqs)
+Main(Seqs)
