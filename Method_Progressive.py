@@ -12,6 +12,26 @@ def Char_Equal(S1,S2):
     return False  
   return S1==S2
 
+def flatten(nested_list):
+    """Recursively flattens a nested list."""
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flat_list.extend(flatten(item))
+        else:
+            flat_list.append(item)
+    return flat_list
+
+def transform_structure(input_list):
+    """Transforms the input list to the desired structure."""
+    output_list = []
+    for element in input_list:
+        if isinstance(element, list) and isinstance(element[0], list):
+            output_list.append(flatten(element))
+        else:
+            output_list.append(element)
+    return output_list
+
 def Levenshtein(seq1,seq2):
     Matrix=[[0]*(len(seq2)+2) for _ in range(len(seq1) + 2)]
     Matrix[0][0]='*'
@@ -116,31 +136,29 @@ def Creat_Profil(Seq1,Seq2):
   profil=[[] for _ in range(len(Seq1))] 
   i=0
   while i<len(Seq1):
-    if Seq1[i]==Seq2[i]:
-      profil[i]=Seq1[i]
+    if Char_Equal(Seq1[i],Seq2[i]):
+         profil[i]=Seq1[i]
     else :
-      profil[i].append(Seq1[i])
-      profil[i].append(Seq2[i])
+       profil[i].append(Seq1[i])
+       profil[i].append(Seq2[i])
+     
     i+=1
+  # to flatten the array from ['T', 'A', 'T', ['_', 'A'], [[['O', '_'], 'I'], 'A']] to ['T', 'A', 'T', ['_', 'A'], ['O', '_', 'I', 'A']]
+  profil=transform_structure(profil)
   return profil  
 
 def Main(Seqs):
   while(len(Seqs)>1):
    Min_Score , Seq1 , Seq2 =Best_Score(Seqs)  
    Matrix=Levenshtein(Seq1,Seq2)
-   Show_LevMatrix(Matrix)
    P=Path(Matrix)
    SEQ,SEQ2=NewSeqs(P,Matrix)
-   print(SEQ,SEQ2)
    Profil=Creat_Profil(SEQ,SEQ2)
    Seqs.remove(Seq1)
    Seqs.remove(Seq2)
    Seqs.append(Profil)
-   print(Profil)
-   print(Seqs)
   print(f"Fin : {Profil}")
 
-
-Seqs=["TAT","GAITO","TAITI","AA"]
+Seqs=["TAT","TATO","TATI","TATAA"]
 index_pairs=Generate_Combinations(Seqs)
 Main(Seqs)
