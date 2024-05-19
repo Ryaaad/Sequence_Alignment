@@ -1,3 +1,6 @@
+import copy
+
+
 def Char_Equal(S1,S2):
   if(isinstance(S1, list) and not isinstance(S2, list) ):
     for i in S1:
@@ -60,13 +63,6 @@ def Show_LevMatrix(Matrix):
      for j in range(len(Matrix[0])) :
       print(f" {Matrix[i][j]} \t " , end='')
      print('\n')
-
-def Generate_Combinations(Seqs):
-  index_pairs=[]
-  for i in range(len(Seqs)):
-    for j in range(i+1,len(Seqs)):
-      index_pairs.append({"i":i,"j":j})
-  return index_pairs  
 
 def Best_Score(Seqs):
   Matrix=Levenshtein(Seqs[0],Seqs[1])
@@ -148,6 +144,7 @@ def Creat_Profil(Seq1,Seq2):
   return profil  
 
 def Main(Seqs):
+  SeqsCopy=copy.deepcopy(Seqs)
   while(len(Seqs)>1):
    Min_Score , Seq1 , Seq2 =Best_Score(Seqs)  
    Matrix=Levenshtein(Seq1,Seq2)
@@ -158,7 +155,16 @@ def Main(Seqs):
    Seqs.remove(Seq2)
    Seqs.append(Profil)
   print(f"Fin : {Profil}")
+  print(SeqsCopy)
+  SeqsCopyCopy=copy.deepcopy(SeqsCopy)
+  for i in SeqsCopy :
+   Matrix=Levenshtein(Profil,i)
+   P=Path(Matrix)
+   SEQ,SEQ2=NewSeqs(P,Matrix)
+   NewSeq = ''.join(SEQ) # convert list to string 
+   SeqsCopyCopy.remove(i)
+   SeqsCopyCopy.append(NewSeq)
+  print(f"{SeqsCopyCopy} ")
 
-Seqs=["TAT","TATO","TATI","TATAA"]
-index_pairs=Generate_Combinations(Seqs)
+Seqs=["TATI","TATO","TATOI","TATAA"]
 Main(Seqs)
