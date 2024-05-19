@@ -127,7 +127,6 @@ def GeneratePaths(Matrix):
 #  print(filepath)
  return paths
 
-
 def GenerateChemin(Matrix,path,filepath,i,j):
 
  while i>1 and j>1 :
