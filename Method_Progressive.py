@@ -1,6 +1,5 @@
 import copy
 
-
 def Char_Equal(S1,S2):
   if(isinstance(S1, list) and not isinstance(S2, list) ):
     for i in S1:
