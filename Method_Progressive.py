@@ -1,21 +1,25 @@
 import copy
 
-def Char_Equal(S1,S2):
-  if(isinstance(S1, list) and not isinstance(S2, list) ):
-    for i in S1:
-      if S2==i:
-        return True
-    return False  
-  
-  if(isinstance(S2, list) and not isinstance(S1, list) ):
-    for i in S2:
-      if S1==i:
-        return True
-    return False  
-  return S1==S2
+def Char_Equal(S1, S2):
+  # Vérifie si S1 est une liste et S2 n'est pas une liste, ou vice versa (c'est le cas où on compare un profil avec une séquence normale). 
+   # dans ce cas en vérifie si le caractère de la séquence à cet indice est inclus dans la liste des caractères du profil à cet indice.
+    if isinstance(S1, list) and not isinstance(S2, list):
+        for i in S1:
+            if S2 == i:
+                return True 
+        return False
+    if isinstance(S2, list) and not isinstance(S1, list):
+        for i in S2:
+            if S1 == i:
+                return True
+        return False
 
-def flatten(nested_list):
-    """Recursively flattens a nested list."""
+    # Si aucun des deux n'est une liste ( cas normal au en compare sequence avec sequence)
+    return S1 == S2
+
+# flatten & transform_structure sont des Fonction qui flat une list cad si on a une list : [a,b,[[c,d],e]] elle vas devenir [a,b,[c,d,e]]  
+# c'est pas mon code c'est just pour fixe la sturtuce de la list pour avoir la structure desire
+def flatten(nested_list): 
     flat_list = []
     for item in nested_list:
         if isinstance(item, list):
@@ -23,7 +27,6 @@ def flatten(nested_list):
         else:
             flat_list.append(item)
     return flat_list
-
 def transform_structure(input_list):
     """Transforms the input list to the desired structure."""
     output_list = []
@@ -34,36 +37,45 @@ def transform_structure(input_list):
             output_list.append(element)
     return output_list
 
-def Levenshtein(seq1,seq2):
-    Matrix=[[0]*(len(seq2)+2) for _ in range(len(seq1) + 2)]
-    Matrix[0][0]='*'
-    Matrix[1][0]='|'
-    Matrix[0][1]='__'
-    for i in range(2,len(Matrix)):
-     Matrix[i][0]=seq1[i-2]
-    for i in range(2,len(Matrix[0])):
-     Matrix[0][i]=seq2[i-2] 
+def Levenshtein(seq1, seq2):
+    # Fonction qui calcule la matrice Levenshtein
+    Matrix = [[0] * (len(seq2) + 2) for _ in range(len(seq1) + 2)]
+    Matrix[0][0] = '*'  
+    Matrix[1][0] = '|'
+    Matrix[0][1] = '__'
 
-    for i in range(2,len(Matrix)):
-     Matrix[i][1]=Matrix[i-1][1]+1
-    for i in range(2,len(Matrix[0])):
-     Matrix[1][i]=Matrix[1][i-1]+1
-    for i in range(2,len(Matrix)):
-      for j in range(2,len(Matrix[0])):
-        cout=0
-        if(Char_Equal(Matrix[i][0],Matrix[0][j]) ): 
-           cout=0
-        else : 
-          cout=1
-        Matrix[i][j]=min(Matrix[i-1][j-1]+cout,Matrix[i][j-1]+1,Matrix[i-1][j]+1)
+    # Initialisation de la 1ere colonne avec les caractères de seq1 et 1ere ligne avec les caractères de seq2
+    for i in range(2, len(Matrix)):
+        Matrix[i][0] = seq1[i-2]
+    for i in range(2, len(Matrix[0])):
+        Matrix[0][i] = seq2[i-2]
+
+    # Initialisation des couts dans la première colonne et la première ligne
+    for i in range(2, len(Matrix)):
+        Matrix[i][1] = Matrix[i-1][1] + 1
+    for i in range(2, len(Matrix[0])):
+        Matrix[1][i] = Matrix[1][i-1] + 1
+
+    for i in range(2, len(Matrix)):
+        for j in range(2, len(Matrix[0])):
+            cost = 0
+            if Char_Equal(Matrix[i][0], Matrix[0][j]): # tester si les caractères sont egaux ou dans le cas ou en calcul avec profil en vois si l'autre caractères est inclu dans la list des caractères que la profil peut prendre a l'indice
+                cost = 0
+            else:
+                cost = 1
+            Matrix[i][j] = min(Matrix[i-1][j-1] + cost, Matrix[i][j-1] + 1, Matrix[i-1][j] + 1)
+
     return Matrix
+
 def Show_LevMatrix(Matrix):
+    # Fonction qui affiche la matrix Levenshtein
    for i in range(len(Matrix)): 
      for j in range(len(Matrix[0])) :
       print(f" {Matrix[i][j]} \t " , end='')
      print('\n')
 
-def Best_Score(Seqs):
+def Best_Score(Seqs): 
+  # Fonction Calcule la Combinison avec best score
   Matrix=Levenshtein(Seqs[0],Seqs[1])
   Min_Score=Matrix[len(Matrix)-1][len(Matrix[0])-1]
   IndexI=0
@@ -78,8 +90,9 @@ def Best_Score(Seqs):
       IndexJ=j
      j+=1
    return Min_Score , Seqs[IndexI] , Seqs[IndexJ], 
-   
+
 def Path(Matrix):
+  # la meme avec la fonction path celle de Needleman_Wunsch.py mais just elle prend min a chaque car en travail avec Levenshtein
   P=[]
   i=len(Matrix)-1 
   j=len(Matrix[0])-1
@@ -128,6 +141,7 @@ def NewSeqs(Path,Matrix):
  return NewSeq1 , NewSeq2
 
 def Creat_Profil(Seq1,Seq2):
+  # Function qui creat profil
   profil=[[] for _ in range(len(Seq1))] 
   i=0
   while i<len(Seq1):
